@@ -1,0 +1,21 @@
+{
+  "name": "skill-exchange-platform",
+  "version": "1.0.0",
+  "description": "SkillBridge - A Peer-to-Peer Skill Exchange and Learning Platform for Web Technologies Project",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "skill-exchange",
+    "peer-to-peer-learning",
+    "web-technologies",
+    "dashboard",
+    "javascript",
+    "html5",
+    "css3"
+  ],
+  "author": "Web Technologies Student Project",
+  "license": "MIT"
+}

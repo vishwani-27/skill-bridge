@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SkillBridge | Peer-to-Peer Skill Exchange Platform</title>
+  <meta name="description"
+    content="A modern, decentralized skill exchange and collaborative learning platform. Exchange knowledge, gain karma credits, and grow together.">
+
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+  <!-- Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+
+  <!-- Project Stylesheets -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+
+<body>
+
+  <div class="app-wrapper">
+    <!-- ==================== SIDEBAR NAVIGATION ==================== -->
+    <aside class="main-sidebar" id="mainSidebar">
+      <div class="sidebar-brand">
+        <div class="brand-logo-icon">
+          <i class="fas fa-network-wired"></i>
+        </div>
+        <div class="brand-text">
+          <h2>SkillBridge</h2>
+          <span class="brand-tag">Peer Exchange</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <span class="nav-section-label">Main Menu</span>
+        <a class="nav-link active" data-view="dashboard" href="#/dashboard">
+          <i class="fas fa-th-large"></i>
+          <span>Dashboard</span>
+        </a>
+        <a class="nav-link" data-view="browse" href="#/browse">
+          <i class="fas fa-compass"></i>
+          <span>Browse Skills</span>
+        </a>
+        <a class="nav-link" data-view="matchmaker" href="#/matchmaker">
+          <i class="fas fa-magic"></i>
+          <span>AI Matchmaker</span>
+          <span class="nav-badge">Smart</span>
+        </a>
+        <a class="nav-link" data-view="swaps" href="#/swaps">
+          <i class="fas fa-exchange-alt"></i>
+          <span>My Swaps</span>
+        </a>
+
+        <span class="nav-section-label">Collaboration</span>
+        <a class="nav-link" data-view="messages" href="#/messages">
+          <i class="fas fa-comments"></i>
+          <span>Messages</span>
+        </a>
+        <a class="nav-link" data-view="room" href="#/room">
+          <i class="fas fa-chalkboard-teacher"></i>
+          <span>Virtual Room</span>
+        </a>
+
+        <span class="nav-section-label">Account</span>
+        <a class="nav-link" data-view="profile" href="#/profile">
+          <i class="fas fa-user-circle"></i>
+          <span>My Profile</span>
+        </a>
+        <a class="nav-link" data-view="settings" href="#/settings">
+          <i class="fas fa-sliders-h"></i>
+          <span>Settings</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-mini-card">
+          <img src="" alt="Alex Rivera" class="avatar-sm user-display-avatar">
+          <div class="user-mini-meta">
+            <div class="user-mini-name user-display-name">Alex Rivera</div>
+            <div class="user-mini-credits">
+              <i class="fas fa-coins text-warning"></i>
+              <span class="user-credits-val">240</span> Karma Credits
+            </div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ==================== MAIN CONTENT WRAPPER ==================== -->
+    <div class="main-content">
+      <!-- Top Sticky Header -->
+      <header class="top-header">
+        <button class="btn-icon mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle Menu">
+          <i class="fas fa-bars"></i>
+        </button>
+
+        <div class="header-search">
+          <i class="fas fa-search"></i>
+          <input type="text" placeholder="Search skills, topics, peers..."
+            onkeydown="if(event.key==='Enter'){ window.AppRouter.navigate('browse'); document.getElementById('marketplaceSearchInput').value=this.value; AppUI.currentSearchQuery=this.value.toLowerCase().trim(); AppUI.renderMarketplace(); }">
+        </div>
+
+        <div class="header-actions">
+          <div class="header-karma-pill" title="Karma points earned by teaching peers">
+            <i class="fas fa-coins text-warning"></i>
+            <span><strong class="user-credits-val">240</strong> Karma</span>
+          </div>
+
+          <button class="btn btn-primary btn-sm"
+            onclick="AppUI.openExchangeModal('user_priya', 'Machine Learning & PyTorch')">
+            <i class="fas fa-plus"></i>
+            <span>Propose Swap</span>
+          </button>
+
+          <button class="btn-icon" id="themeToggleBtn" title="Toggle Dark/Light Mode">
+            <i class="fas fa-moon"></i>
+          </button>
+
+          <a href="#/profile" class="btn-icon" style="overflow: hidden; padding: 0;">
+            <img src="" alt="Profile" class="avatar-sm user-display-avatar">
+          </a>
+        </div>
+      </header>
+
+      <!-- Main Page Container with Views -->
+      <main class="page-container">
+
+        <!-- ==========================================
+             VIEW 1: DASHBOARD
+             ========================================== -->
+        <section id="view-dashboard" class="view-section active">
+          <!-- Hero Banner -->
+          <div class="dash-hero-banner">
+            <div class="hero-content">
+              <h1 id="dashboardGreeting">Good Evening, Alex 👋</h1>
+              <p>You have <strong>2 active skill swaps</strong> in progress and <strong>1 new exchange proposal</strong>
+                waiting for your approval. Keep sharing knowledge to boost your karma!</p>
+              <div class="hero-actions">
+                <a href="#/browse" class="btn btn-hero-primary">
+                  <i class="fas fa-search"></i> Explore Skills
+                </a>
+                <a href="#/matchmaker" class="btn btn-hero-secondary">
+                  <i class="fas fa-magic"></i> AI Matchmaker
+                </a>
+                <button class="btn btn-hero-secondary"
+                  onclick="document.getElementById('addOfferedSkillModal').classList.add('active')">
+                  <i class="fas fa-plus"></i> Post a Skill
+                </button>
+              </div>
+            </div>
+            <div class="hero-badge-art">
+              <div class="floating-karma-card">
+                <div class="karma-label">Total Karma Balance</div>
+                <div class="karma-value">
+                  <i class="fas fa-coins text-warning"></i>
+                  <span class="user-credits-val">240</span>
+                </div>
+                <span class="badge badge-success"><i class="fas fa-arrow-up"></i> +45 this week</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 4 Stat Summary Metric Cards -->
+          <div class="dash-metrics-grid">
+            <div class="metric-card">
+              <div class="metric-icon-wrap" style="background: rgba(99, 102, 241, 0.12); color: #6366f1;">
+                <i class="fas fa-sync-alt"></i>
+              </div>
+              <div class="metric-info">
+                <div class="metric-label">Active Exchanges</div>
+                <div class="metric-num" id="dashStatActiveSwaps">2</div>
+                <div class="metric-delta delta-up"><i class="fas fa-arrow-up"></i> 1 in progress</div>
+              </div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-icon-wrap" style="background: rgba(16, 185, 129, 0.12); color: #10b981;">
+                <i class="fas fa-chalkboard-teacher"></i>
+              </div>
+              <div class="metric-info">
+                <div class="metric-label">Skills Offered</div>
+                <div class="metric-num" id="dashStatSkillsOffered">5</div>
+                <div class="metric-delta delta-up"><i class="fas fa-check"></i> 58h shared</div>
+              </div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-icon-wrap" style="background: rgba(6, 182, 212, 0.12); color: #06b6d4;">
+                <i class="fas fa-graduation-cap"></i>
+              </div>
+              <div class="metric-info">
+                <div class="metric-label">Skills Learning</div>
+                <div class="metric-num" id="dashStatSkillsWanted">4</div>
+                <div class="metric-delta delta-neutral"><i class="fas fa-bullseye"></i> 44h learned</div>
+              </div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-icon-wrap" style="background: rgba(245, 158, 11, 0.12); color: #f59e0b;">
+                <i class="fas fa-star"></i>
+              </div>
+              <div class="metric-info">
+                <div class="metric-label">Reputation Score</div>
+                <div class="metric-num"><span class="user-rating-val">4.96</span>★</div>
+                <div class="metric-delta delta-up"><i class="fas fa-award"></i> 42 peer reviews</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Two-Column Grid: Main Visuals vs Sidebar Widgets -->
+          <div class="dashboard-grid">
+            <div class="dash-main-col">
+              <!-- Upcoming Sessions Schedule -->
+              <div class="chart-card-wrapper">
+                <div class="chart-header">
+                  <h3><i class="far fa-calendar-alt text-primary"></i> Upcoming Exchange Sessions</h3>
+                  <a href="#/swaps" class="text-sm text-primary fw-bold">View All Swaps →</a>
+                </div>
+                <div class="sessions-list-wrap" id="dashUpcomingSessionsList">
+                  <!-- Dynamically populated -->
+                </div>
+              </div>
+
+              <!-- Learning Analytics & Charts -->
+              <div class="chart-card-wrapper">
+                <div class="chart-header">
+                  <h3><i class="fas fa-chart-line text-primary"></i> Exchange Activity & Category Insights</h3>
+                </div>
+                <div class="dual-charts-grid">
+                  <div>
+                    <h5 class="text-xs text-muted fw-bold mb-2">HOURS TAUGHT VS LEARNED (LAST 6 MONTHS)</h5>
+                    <div class="chart-canvas-container">
+                      <canvas id="hoursExchangeChart"></canvas>
+                    </div>
+                  </div>
+                  <div>
+                    <h5 class="text-xs text-muted fw-bold mb-2">SKILL DOMAINS RATIO</h5>
+                    <div class="chart-canvas-container">
+                      <canvas id="categoryPieChart"></canvas>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right Column Widgets -->
+            <div class="dash-side-col">
+              <!-- Top Recommended Matches -->
+              <div class="chart-card-wrapper">
+                <div class="chart-header">
+                  <h3><i class="fas fa-bolt text-warning"></i> Smart Matches</h3>
+                  <a href="#/matchmaker" class="text-sm text-primary fw-bold">Explore All →</a>
+                </div>
+                <div class="matches-widget-list" id="dashMatchesList">
+                  <!-- Dynamically populated -->
+                </div>
+              </div>
+
+              <!-- Recent Activity Timeline -->
+              <div class="chart-card-wrapper">
+                <div class="chart-header">
+                  <h3><i class="fas fa-history text-primary"></i> Activity Log</h3>
+                </div>
+                <div class="activity-timeline" id="dashActivityList">
+                  <!-- Dynamically populated -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==========================================
+             VIEW 2: BROWSE SKILLS MARKETPLACE
+             ========================================== -->
+        <section id="view-browse" class="view-section">
+          <div class="view-header">
+            <div>
+              <h1 class="view-title">Skill Marketplace</h1>
+              <p class="view-subtitle">Discover peer mentors offering skills in programming, AI, design, music, and
+                languages.</p>
+            </div>
+            <button class="btn btn-primary"
+              onclick="document.getElementById('addOfferedSkillModal').classList.add('active')">
+              <i class="fas fa-plus"></i> Offer a New Skill
+            </button>
+          </div>
+
+          <div class="marketplace-controls">
+            <div class="search-box-large">
+              <i class="fas fa-search"></i>
+              <input type="text" id="marketplaceSearchInput"
+                placeholder="Filter by skill, category, tags, or peer name (e.g. PyTorch, Spanish, Blender)...">
+            </div>
+
+            <div class="category-filter-chips">
+              <button class="category-filter-btn active" data-category="all">All Disciplines</button>
+              <button class="category-filter-btn" data-category="Programming">Programming & Tech</button>
+              <button class="category-filter-btn" data-category="Data & AI">Data Science & AI</button>
+              <button class="category-filter-btn" data-category="Languages">Languages</button>
+              <button class="category-filter-btn" data-category="Creative">Design & 3D</button>
+              <button class="category-filter-btn" data-category="Soft Skills">Soft Skills & Public Speaking</button>
+              <button class="category-filter-btn" data-category="Music">Music & Audio</button>
+            </div>
+          </div>
+
+          <div class="skills-grid" id="marketplaceGrid">
+            <!-- Dynamically populated -->
+          </div>
+        </section>
+
+        <!-- ==========================================
+             VIEW 3: AI MATCHMAKER
+             ========================================== -->
+        <section id="view-matchmaker" class="view-section">
+          <div class="view-header">
+            <div>
+              <h1 class="view-title">Smart Matchmaker Engine</h1>
+              <p class="view-subtitle">Algorithmic reciprocal pairing: we match what you offer with peers who want it,
+                and vice-versa.</p>
+            </div>
+          </div>
+
+          <div class="matchmaker-banner">
+            <div class="matchmaker-banner-icon">
+              <i class="fas fa-brain"></i>
+            </div>
+            <div>
+              <h4 style="font-size: 1.1rem; font-weight: 800;">Reciprocal Matching Algorithm</h4>
+              <p style="font-size: 0.88rem; color: var(--text-secondary); margin-top: 4px;">
+                Our matching model computes bidirectional compatibility scores. When you teach a skill another student
+                desires and they teach what you have in your learning roadmap, a <strong>Direct Reciprocal Swap</strong>
+                is generated!
+              </p>
+            </div>
+          </div>
+
+          <div id="matchmakerResultsGrid">
+            <!-- Dynamically populated -->
+          </div>
+        </section>
+
+        <!-- ==========================================
+             VIEW 4: MY SWAPS & REQUESTS
+             ========================================== -->
+        <section id="view-swaps" class="view-section">
+          <div class="view-header">
+            <div>
+              <h1 class="view-title">Exchange Management</h1>
+              <p class="view-subtitle">Track ongoing partnerships, review proposals, and download completed exchange
+                certificates.</p>
+            </div>
+          </div>
+
+          <div class="swaps-tabs-nav">
+            <button class="swaps-tab-btn active" data-tab="active">
+              <i class="fas fa-play-circle text-primary"></i> Active Swaps <span id="tabCountActive">(2)</span>
+            </button>
+            <button class="swaps-tab-btn" data-tab="received">
+              <i class="fas fa-inbox text-warning"></i> Received Requests <span id="tabCountReceived">(2)</span>
+            </button>
+            <button class="swaps-tab-btn" data-tab="sent">
+              <i class="fas fa-paper-plane text-info"></i> Sent Proposals <span id="tabCountSent">(1)</span>
+            </button>
+            <button class="swaps-tab-btn" data-tab="completed">
+              <i class="fas fa-check-double text-success"></i> Completed History <span id="tabCountCompleted">(1)</span>
+            </button>
+          </div>
+
+          <div class="swaps-list" id="swapsListContainer">
+            <!-- Dynamically populated -->
+          </div>
+        </section>
+
+        <!-- ==========================================
+             VIEW 5: CHAT & LIVE MESSAGING
+             ========================================== -->
+        <section id="view-messages" class="view-section">
+          <div class="view-header">
+            <div>
+              <h1 class="view-title">Direct Messages</h1>
+              <p class="view-subtitle">Coordinate exchange sessions, share study resources, and discuss curriculum with
+                peers.</p>
+            </div>
+          </div>
+
+          <div class="chat-window-wrapper">
+            <!-- Thread Sidebar -->
+            <div class="chat-threads-sidebar">
+              <div class="chat-sidebar-header">
+                <span>Conversations</span>
+                <span class="badge badge-primary">Active</span>
+              </div>
+              <div class="chat-thread-list" id="chatThreadList">
+                <!-- Dynamically populated -->
+              </div>
+            </div>
+
+            <!-- Active Conversation Panel -->
+            <div class="chat-active-panel">
+              <div class="chat-panel-header">
+                <div class="chat-partner-cell">
+                  <img src="" alt="Partner" class="avatar-sm" id="activeChatPartnerAvatar">
+                  <div>
+                    <h4 id="activeChatPartnerName">Priya Sharma</h4>
+                    <span class="text-xs text-primary fw-bold" id="activeChatPartnerTopic">Topic</span>
+                  </div>
+                </div>
+                <div class="btn-group">
+                  <button class="btn btn-primary btn-sm" onclick="SessionRoom.startSession()">
+                    <i class="fas fa-video"></i> Launch Room
+                  </button>
+                </div>
+              </div>
+
+              <div class="chat-messages-container" id="chatMessagesBox">
+                <!-- Dynamically populated message bubbles -->
+              </div>
+
+              <div class="chat-input-bar">
+                <form id="chatSendForm">
+                  <input type="text" id="chatMessageInput" placeholder="Type a message to your exchange partner..."
+                    autocomplete="off">
+                  <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-paper-plane"></i> Send
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==========================================
+             VIEW 6: VIRTUAL SESSION ROOM
+             ========================================== -->
+        <section id="view-room" class="view-section">
+          <div class="view-header">
+            <div>
+              <h1 class="view-title">Virtual Study & Exchange Room</h1>
+              <p class="view-subtitle" id="roomTopicTitle">Interactive 1-on-1 collaborative workspace</p>
+            </div>
+            <div class="room-timer-badge">
+              <i class="fas fa-stopwatch text-primary"></i>
+              <span id="sessionTimerDisplay">00:00</span>
+              <button class="btn-icon btn-sm" id="btnPauseTimer" style="width:28px; height:28px; margin-left:6px;"
+                title="Pause/Resume">
+                <i class="fas fa-pause"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="session-room-layout">
+            <div class="room-stage-col">
+              <!-- Video Feeds Mockup -->
+              <div class="video-feeds-container">
+                <!-- Self Feed -->
+                <div class="video-box" id="selfVideoContainer">
+                  <div class="video-avatar-center" id="selfVideoPlaceholder">
+                    <img src="" alt="Alex Rivera" class="user-display-avatar">
+                    <p class="user-display-name">Alex Rivera (You)</p>
+                  </div>
+                  <div class="video-label-badge">
+                    <span class="live-wave-indicator"></span>
+                    <span>You (Sharing Screen)</span>
+                  </div>
+                </div>
+
+                <!-- Peer Feed -->
+                <div class="video-box" id="peerVideoContainer">
+                  <div class="video-avatar-center">
+                    <img src="" alt="Peer" id="roomPeerAvatar">
+                    <p id="roomPartnerName">Marcus Vance</p>
+                  </div>
+                  <div class="video-label-badge">
+                    <span class="live-wave-indicator"></span>
+                    <span id="roomPartnerRole">Partner</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Controls Toolbar -->
+              <div class="room-controls-bar">
+                <div class="room-controls-group">
+                  <button class="control-btn" id="btnToggleMic">
+                    <i class="fas fa-microphone"></i>
+                    <span>Mute</span>
+                  </button>
+                  <button class="control-btn" id="btnToggleVideo">
+                    <i class="fas fa-video"></i>
+                    <span>Stop Video</span>
+                  </button>
+                  <button class="control-btn" id="btnToggleShare">
+                    <i class="fas fa-desktop"></i>
+                    <span>Share Screen</span>
+                  </button>
+                </div>
+
+                <div class="room-controls-group">
+                  <button class="btn btn-secondary btn-sm" id="btnDownloadNotes">
+                    <i class="fas fa-download"></i> Save Notes (.txt)
+                  </button>
+                  <button class="btn btn-end-call btn-sm" id="btnEndSession">
+                    <i class="fas fa-phone-slash"></i> End & Complete Session
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Notes & Code Scratchpad Column -->
+            <div class="room-notes-col">
+              <div class="notes-header">
+                <h4><i class="fas fa-file-code text-primary"></i> Shared Scratchpad & Notes</h4>
+                <span class="badge badge-primary">Auto-saved</span>
+              </div>
+              <textarea class="notes-textarea" id="sessionNotesArea"
+                placeholder="// Session Notes & Code Snippets&#10;// Type here during your peer exchange...&#10;&#10;Key Concepts Covered:&#10;1. React 19 Actions and useActionState()&#10;2. Blender 4.0 Subsurface scattering and topology&#10;3. Homework exercises for next Saturday"></textarea>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==========================================
+             VIEW 7: USER PROFILE & BADGES
+             ========================================== -->
+        <section id="view-profile" class="view-section">
+          <!-- Profile Hero -->
+          <div class="profile-hero-card">
+            <div class="profile-main-info">
+              <img src="" alt="Alex Rivera" class="avatar-xl user-display-avatar">
+              <div class="profile-names">
+                <h2 class="user-display-name">Alex Rivera</h2>
+                <div class="profile-title-tag user-display-title">Full-Stack Developer & UI/UX Designer</div>
+                <div class="profile-uni-tag" id="profUniversityText">Stanford University (CS Dept)</div>
+                <p class="text-sm text-secondary mt-2" id="profBioText" style="max-width: 520px;"></p>
+              </div>
+            </div>
+
+            <div class="profile-metrics-strip">
+              <div class="prof-metric-item">
+                <div class="prof-metric-val"><span id="profRatingVal">4.96</span>★</div>
+                <div class="prof-metric-label" id="profReviewCount">(42 reviews)</div>
+              </div>
+              <div class="prof-metric-item">
+                <div class="prof-metric-val" id="profHoursTaught">58</div>
+                <div class="prof-metric-label">Hours Taught</div>
+              </div>
+              <div class="prof-metric-item">
+                <div class="prof-metric-val" id="profHoursLearned">44</div>
+                <div class="prof-metric-label">Hours Learned</div>
+              </div>
+              <div class="prof-metric-item">
+                <div class="prof-metric-val" id="profCompletedCount">26</div>
+                <div class="prof-metric-label">Completed Swaps</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Profile Details Grid -->
+          <div class="profile-content-grid">
+            <!-- Left Column: Skills Offered & Wanted -->
+            <div style="display: flex; flex-direction: column; gap: 24px;">
+              <!-- Skills Offered -->
+              <div class="card">
+                <div class="chart-header">
+                  <h3><i class="fas fa-hand-holding-heart text-primary"></i> Skills I Teach / Offer</h3>
+                  <button class="btn btn-outline-primary btn-sm"
+                    onclick="document.getElementById('addOfferedSkillModal').classList.add('active')">
+                    <i class="fas fa-plus"></i> Add
+                  </button>
+                </div>
+                <div id="profSkillsOfferedList">
+                  <!-- Dynamically populated -->
+                </div>
+              </div>
+
+              <!-- Skills Wanted -->
+              <div class="card">
+                <div class="chart-header">
+                  <h3><i class="fas fa-bullseye text-success"></i> Skills I Want to Learn</h3>
+                  <button class="btn btn-outline-success btn-sm"
+                    onclick="document.getElementById('addWantedSkillModal').classList.add('active')">
+                    <i class="fas fa-plus"></i> Add
+                  </button>
+                </div>
+                <div id="profSkillsWantedList">
+                  <!-- Dynamically populated -->
+                </div>
+              </div>
+            </div>
+
+            <!-- Right Column: Badges & Reviews -->
+            <div style="display: flex; flex-direction: column; gap: 24px;">
+              <!-- Badges -->
+              <div class="card">
+                <div class="chart-header">
+                  <h3><i class="fas fa-medal text-warning"></i> Achievements & Badges</h3>
+                </div>
+                <div class="badges-grid" id="profBadgesGrid">
+                  <!-- Dynamically populated -->
+                </div>
+              </div>
+
+              <!-- Peer Reviews -->
+              <div class="card">
+                <div class="chart-header">
+                  <h3><i class="fas fa-comments text-primary"></i> Verified Peer Endorsements</h3>
+                </div>
+                <div class="reviews-list" id="profReviewsList">
+                  <!-- Dynamically populated -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==========================================
+             VIEW 8: SETTINGS
+             ========================================== -->
+        <section id="view-settings" class="view-section">
+          <div class="view-header">
+            <div>
+              <h1 class="view-title">Platform Preferences</h1>
+              <p class="view-subtitle">Manage your profile, theme preferences, and demo storage state.</p>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px;">
+            <div class="card">
+              <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 18px;">Edit Profile Information</h3>
+              <form id="settingsProfileForm">
+                <div class="form-group">
+                  <label class="form-label">Full Name</label>
+                  <input type="text" id="settingsUserName" class="form-control" required>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Headline / Title</label>
+                  <input type="text" id="settingsUserTitle" class="form-control" required>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">University / Institution</label>
+                  <input type="text" id="settingsUserUniversity" class="form-control" required>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Bio & Interests</label>
+                  <textarea id="settingsUserBio" class="form-control" rows="4"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                  <i class="fas fa-save"></i> Save Profile Changes
+                </button>
+              </form>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 20px;">
+              <div class="card">
+                <h4 style="font-size: 1rem; font-weight: 700; margin-bottom: 12px;"><i
+                    class="fas fa-database text-warning"></i> Demo Reset</h4>
+                <p class="text-sm text-secondary mb-3">Restore sample users, skills, exchange requests, and
+                  conversations to their initial defaults.</p>
+                <button class="btn btn-secondary w-100" id="btnResetDemo">
+                  <i class="fas fa-undo"></i> Reset Sample Data
+                </button>
+              </div>
+
+              <div class="card">
+                <h4 style="font-size: 1rem; font-weight: 700; margin-bottom: 8px;"><i
+                    class="fas fa-graduation-cap text-primary"></i> Academic Project</h4>
+                <p class="text-sm text-secondary">
+                  <strong>Course:</strong> Web Technologies<br>
+                  <strong>Architecture:</strong> HTML5, Modern CSS3 Variables, Modular ES6+, Chart.js, LocalStorage
+                  State Management.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL DIALOGS ==================== -->
+
+  <!-- 1. Propose Exchange Modal -->
+  <div class="modal" id="exchangeModal">
+    <div class="modal-overlay"></div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3><i class="fas fa-exchange-alt text-primary"></i> Propose Skill Swap</h3>
+        <button class="btn-close-modal"><i class="fas fa-times"></i></button>
+      </div>
+      <form id="proposeExchangeForm">
+        <div class="modal-body">
+          <input type="hidden" id="exchangeTargetUserId">
+          <div class="user-cell mb-3" style="background: var(--bg-subtle); padding: 12px; border-radius: 8px;">
+            <img src="" alt="Partner" class="avatar-sm" id="modalPartnerAvatar">
+            <div>
+              <h5 id="modalPartnerName">Partner Name</h5>
+              <span class="text-xs text-muted">Exchange Partner</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Skill You Want to Learn (From Partner)</label>
+            <input type="text" id="exchangeSkillRequested" class="form-control" readonly>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Which of Your Skills Will You Offer in Return?</label>
+            <select id="exchangeSkillOfferedSelect" class="form-control" required></select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Exchange Duration</label>
+            <select id="exchangeSessionsSelect" class="form-control">
+              <option value="3 Sessions (1 hour each)">3 Sessions (1 hour each)</option>
+              <option value="4 Sessions (1 hour each)" selected>4 Sessions (1 hour each)</option>
+              <option value="5 Sessions (45 mins each)">5 Sessions (45 mins each)</option>
+              <option value="Ongoing Weekly Exchange">Ongoing Weekly Exchange</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Introductory Message & Schedule Proposal</label>
+            <textarea id="exchangeMessageText" class="form-control" rows="3"
+              placeholder="Hi! I would love to connect and swap skills. I'm usually free on weekends..."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-close-modal">Cancel</button>
+          <button type="submit" class="btn btn-primary"><i class="fas fa-paper-plane"></i> Send Swap Proposal</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 2. Add Skill to Offer Modal -->
+  <div class="modal" id="addOfferedSkillModal">
+    <div class="modal-overlay"></div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3><i class="fas fa-plus text-primary"></i> Offer a New Skill</h3>
+        <button class="btn-close-modal"><i class="fas fa-times"></i></button>
+      </div>
+      <form id="addSkillOfferedForm">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Skill Title</label>
+            <input type="text" id="offeredSkillTitle" class="form-control"
+              placeholder="e.g., Python Data Science, UI/UX in Figma..." required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Category</label>
+            <select id="offeredSkillCategory" class="form-control">
+              <option value="Programming">Programming & Tech</option>
+              <option value="Data & AI">Data & AI</option>
+              <option value="Design">Design & 3D</option>
+              <option value="Languages">Languages</option>
+              <option value="Soft Skills">Soft Skills</option>
+              <option value="Music & Audio">Music & Audio</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Your Proficiency Level</label>
+            <select id="offeredSkillLevel" class="form-control">
+              <option value="Intermediate">Intermediate</option>
+              <option value="Advanced" selected>Advanced</option>
+              <option value="Expert">Expert</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-close-modal">Cancel</button>
+          <button type="submit" class="btn btn-primary"><i class="fas fa-check"></i> Add to My Portfolio</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 3. Add Skill Wanted Modal -->
+  <div class="modal" id="addWantedSkillModal">
+    <div class="modal-overlay"></div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3><i class="fas fa-bullseye text-success"></i> Add Skill to Learning Roadmap</h3>
+        <button class="btn-close-modal"><i class="fas fa-times"></i></button>
+      </div>
+      <form id="addSkillWantedForm">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Skill You Want to Learn</label>
+            <input type="text" id="wantedSkillTitle" class="form-control"
+              placeholder="e.g., French Fluency, Cloud DevOps, Piano..." required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Category</label>
+            <select id="wantedSkillCategory" class="form-control">
+              <option value="Languages">Languages</option>
+              <option value="Programming">Programming & Tech</option>
+              <option value="Data & AI">Data & AI</option>
+              <option value="Creative & 3D">Creative & 3D</option>
+              <option value="Soft Skills">Soft Skills</option>
+              <option value="Music & Audio">Music & Audio</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Target Level</label>
+            <select id="wantedSkillTargetLevel" class="form-control">
+              <option value="Beginner">Beginner</option>
+              <option value="Intermediate" selected>Intermediate</option>
+              <option value="Advanced">Advanced</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Learning Priority</label>
+            <select id="wantedSkillPriority" class="form-control">
+              <option value="High" selected>High Priority</option>
+              <option value="Medium">Medium Priority</option>
+              <option value="Low">Low Priority</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-close-modal">Cancel</button>
+          <button type="submit" class="btn btn-success"><i class="fas fa-check"></i> Save to Learning Goals</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 4. Session Completion Modal -->
+  <div class="modal" id="completeSessionModal">
+    <div class="modal-overlay"></div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3><i class="fas fa-award text-warning"></i> Complete Exchange Session</h3>
+        <button class="btn-close-modal"><i class="fas fa-times"></i></button>
+      </div>
+      <form id="completeSessionForm">
+        <div class="modal-body">
+          <p class="text-sm text-secondary mb-3">Congratulations on completing your exchange session with <strong
+              id="completePartnerName">Marcus Vance</strong>!</p>
+
+          <div class="form-group">
+            <label class="form-label">Rate Your Learning Experience</label>
+            <div style="display: flex; gap: 16px; font-size: 1.5rem; color: #f59e0b; margin-top: 6px;">
+              <label style="cursor: pointer;"><input type="radio" name="sessionRating" value="5" checked
+                  style="display:none;"> ★★★★★ (5/5)</label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Endorsement & Feedback</label>
+            <textarea id="sessionFeedbackText" class="form-control" rows="3"
+              placeholder="Share how helpful this peer mentor was..."></textarea>
+          </div>
+
+          <div
+            style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 8px; padding: 12px; display: flex; align-items: center; gap: 10px;">
+            <i class="fas fa-coins text-warning" style="font-size: 1.4rem;"></i>
+            <span class="text-sm font-bold text-success"><strong>+25 Karma Credits</strong> will be awarded to your
+              account upon completion!</span>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-close-modal">Cancel</button>
+          <button type="submit" class="btn btn-success"><i class="fas fa-check-circle"></i> Log & Reward
+            Credits</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 5. Certificate of Exchange Completion Modal -->
+  <div class="modal" id="certificateModal">
+    <div class="modal-overlay"></div>
+    <div class="modal-content" style="max-width: 640px;">
+      <div class="modal-header">
+        <h3><i class="fas fa-certificate text-warning"></i> Peer Exchange Certificate</h3>
+        <button class="btn-close-modal"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <div class="certificate-preview-box" id="printableCertificate">
+          <div class="cert-seal">
+            <i class="fas fa-award"></i>
+          </div>
+          <div class="cert-title">Certificate of Skill Exchange</div>
+          <div class="cert-sub">Decentralized Peer-to-Peer Learning Network</div>
+
+          <p style="font-size: 0.95rem; color: #475569; margin-top: 18px;">This document certifies that</p>
+          <div class="cert-recipient" id="certStudentName">Alex Rivera</div>
+          <p style="font-size: 0.95rem; color: #475569;">has successfully completed a bidirectional peer skill exchange
+            with</p>
+          <h4 style="font-size: 1.15rem; color: #1e293b; margin: 4px 0;" id="certPartnerName">Sarah Jenkins</h4>
+
+          <div class="cert-skills-badge" id="certSkillPair">Node.js & REST APIs ⇄ Public Speaking</div>
+
+          <p style="font-size: 0.8rem; color: #64748b; margin-top: 14px;">
+            Awarded on <strong id="certDate">November 11, 2026</strong> • Verified by SkillBridge Consensus Protocol
+          </p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary btn-close-modal">Close</button>
+        <button class="btn btn-primary" onclick="window.print()">
+          <i class="fas fa-print"></i> Print / Save as PDF
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Stack -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- App Scripts -->
+  <script src="js/mockData.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/charts.js"></script>
+  <script src="js/sessionRoom.js"></script>
+  <script src="js/router.js"></script>
+  <script src="js/app.js"></script>
+</body>
+
+</html>
